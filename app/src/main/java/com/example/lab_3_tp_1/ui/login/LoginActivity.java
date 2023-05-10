@@ -30,8 +30,19 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mv.confirmarLogin(binding.etMail.getText().toString(), binding.etClave.getText().toString());
+                mv.getDataUsuarioMutable().observe(LoginActivity.this, new Observer<Usuario>() {
+                    @Override
+                    public void onChanged(Usuario usuario) {
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("usuario", usuario);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
             }
         });
+
+
 
         binding.btnIrARegistrarse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
         mv.getLoginSuccess().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean loginSuccess) {

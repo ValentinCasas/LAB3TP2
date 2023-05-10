@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,12 +26,16 @@ public class LoginActivityViewModel extends AndroidViewModel {
         super(application);
         context = application.getApplicationContext();
         apiClient = new ApiClient();
+        dataUsuarioMutable = new MutableLiveData<>();
     }
 
     public LiveData<Boolean> getLoginSuccess() {
-        loginSuccess = new MutableLiveData<>();
+        if (loginSuccess == null) {
+            loginSuccess = new MutableLiveData<>();
+        }
         return loginSuccess;
     }
+
     public LiveData<Usuario> getDataUsuarioMutable() {
         if (dataUsuarioMutable == null) {
             dataUsuarioMutable = new MutableLiveData<>();
@@ -40,21 +45,19 @@ public class LoginActivityViewModel extends AndroidViewModel {
 
 
     public void confirmarLogin(String mail, String clave) {
-        Usuario usuario = apiClient.login(context,mail,clave);
-
-        loginSuccess.setValue(usuario != null ? true : false);
-    }
-
-    public void leerDatos() {
-        Usuario usuario = apiClient.leer(context);
-        if(usuario != null){
-            dataUsuarioMutable.setValue(usuario);
-        }else{
+        Usuario usuario = apiClient.login(context, mail, clave);
+        if (usuario != null) {
+            loginSuccess.setValue(true);
+            if (dataUsuarioMutable != null) {
+                dataUsuarioMutable.setValue(usuario);
+            }
+            Log.d("dataUsuarioMutable", dataUsuarioMutable.getValue().toString());
+            Log.d("confirmarLogin-usuario", usuario.toString());
+        } else {
+            loginSuccess.setValue(false);
             Toast.makeText(context, "Credenciales erroneas", Toast.LENGTH_SHORT).show();
         }
     }
 
 
-
 }
-

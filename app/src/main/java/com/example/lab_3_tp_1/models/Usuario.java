@@ -1,6 +1,9 @@
 package com.example.lab_3_tp_1.models;
 
-public class Usuario {
+import java.io.Serializable;
+
+public class Usuario implements Serializable {
+
     private String nombre;
     private String apellido;
     private long dni;
@@ -14,11 +17,6 @@ public class Usuario {
         this.mail = mail;
         this.clave = clave;
     }
-
-    public Usuario(String nombre) {
-        this.nombre = nombre;
-    }
-
     public String getNombre() {
         return nombre;
     }
@@ -57,5 +55,16 @@ public class Usuario {
 
     public void setClave(String clave) {
         this.clave = clave;
+    }
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", dni=" + dni +
+                ", mail='" + mail + '\'' +
+                ", clave='" + clave + '\'' +
+                '}';
     }
 }

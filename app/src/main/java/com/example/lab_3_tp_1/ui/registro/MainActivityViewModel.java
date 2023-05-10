@@ -13,6 +13,9 @@ import com.example.lab_3_tp_1.models.Usuario;
 import com.example.lab_3_tp_1.ui.login.LoginActivity;
 import com.example.lab_3_tp_1.ui.request.ApiClient;
 
+import java.io.File;
+import java.util.ArrayList;
+
 public class MainActivityViewModel extends AndroidViewModel {
 
     private Context context;
@@ -27,8 +30,15 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void registrarUsuario(String nombre, String apellido, String dni, String mail, String clave) {
         try {
             Long dniLong = Long.parseLong(dni);
-            Usuario usuario = new Usuario(nombre, apellido, dniLong, mail, clave);
 
+            // Validar si el correo electrónico ya está en uso
+            Usuario usuarioRegistrado = apiClient.login(context, mail, clave);
+            if (usuarioRegistrado != null) {
+                Toast.makeText(context, "Ya existe un usuario registrado con ese correo electrónico", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Usuario usuario = new Usuario(nombre, apellido, dniLong, mail, clave);
             apiClient.registrar(context, usuario);
 
             Intent intent = new Intent(context, LoginActivity.class);
@@ -40,7 +50,6 @@ public class MainActivityViewModel extends AndroidViewModel {
         } catch (Exception e) {
             Toast.makeText(context, "Error al registrar usuario", Toast.LENGTH_SHORT).show();
         }
-
     }
-
 }
+

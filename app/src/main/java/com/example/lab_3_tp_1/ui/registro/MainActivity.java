@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MainActivityViewModel mv;
     private LoginActivityViewModel loginViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,31 +26,25 @@ public class MainActivity extends AppCompatActivity {
         mv = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(MainActivityViewModel.class);
         loginViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(LoginActivityViewModel.class);
 
+        Usuario usuario = (Usuario) getIntent().getSerializableExtra("usuario");
+        if (usuario != null) {
+            binding.etNombre.setText(usuario.getNombre());
+            binding.etApellido.setText(usuario.getApellido());
+            binding.etDni.setText(String.valueOf(usuario.getDni()));
+            binding.etMail.setText(usuario.getMail());
+            binding.etClave.setText(usuario.getClave());
+        }
 
-        loginViewModel.getDataUsuarioMutable().observe(this, new Observer<Usuario>() {
+        binding.btnRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChanged(Usuario usuario) {
-
-                binding.etNombre.setText(usuario.getNombre());
-                binding.etApellido.setText(usuario.getApellido());
-                binding.etDni.setText(String.valueOf(usuario.getDni()));
-                binding.etMail.setText(usuario.getMail());
-                binding.etClave.setText(usuario.getClave());
-
+            public void onClick(View v) {
+                mv.registrarUsuario(binding.etNombre.getText().toString(),
+                        binding.etApellido.getText().toString(),
+                        binding.etDni.getText().toString(),
+                        binding.etMail.getText().toString(),
+                        binding.etClave.getText().toString());
             }
         });
-
-        loginViewModel.leerDatos();
-        binding.btnRegistrar.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                mv.registrarUsuario(binding.etNombre.getText().toString()
-                        ,binding.etApellido.getText().toString()
-                        ,binding.etDni.getText().toString()
-                        ,binding.etMail.getText().toString()
-                        ,binding.etClave.getText().toString());
-            }
-        });
-
     }
 }
+

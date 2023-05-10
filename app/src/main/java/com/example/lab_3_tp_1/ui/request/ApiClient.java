@@ -2,57 +2,71 @@ package com.example.lab_3_tp_1.ui.request;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.lab_3_tp_1.models.Usuario;
 
+import java.io.BufferedOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+
 public class ApiClient {
 
-    private static SharedPreferences sp;
+    public static void registrar(Context context, Usuario usuario) {
 
-    private static SharedPreferences conectar(Context context){
-        if(sp == null){
-            sp = context.getSharedPreferences("datos",0);
+        File archivo = new File(context.getFilesDir(), "personal.dat");
+        try {
+            FileOutputStream fos = new FileOutputStream(archivo, false); // Modificado para sobrescribir los datos antiguos
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(usuario);
+            oos.flush();
+            oos.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return sp;
     }
 
-    public static void registrar(Context context, Usuario usuario){
-        SharedPreferences sp = conectar(context);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putLong("dni",usuario.getDni());
-        editor.putString("apellido",usuario.getApellido());
-        editor.putString("nombre",usuario.getNombre());
-        editor.putString("mail",usuario.getMail());
-        editor.putString("clave",usuario.getClave());
-        editor.commit();
-    }
+    public static Usuario leer(Context context) {
 
-    public static Usuario leer(Context context){
-        SharedPreferences sp = conectar(context);
-        Long dni = sp.getLong("dni",-1);
-        String apellido = sp.getString("apellido","-1");
-        String nombre = sp.getString("nombre","-1");
-        String mail = sp.getString("mail","-1");
-        String clave = sp.getString("clave","-1");
-
-        Usuario usuario = new Usuario(nombre,apellido,dni,mail,clave);
-
-        return usuario;
-    }
-
-    public static Usuario login(Context context, String mail, String password){
-        Usuario usuarioLogin = null;
-        SharedPreferences sp = conectar(context);
-        Long dniLogin = sp.getLong("dni",-1);
-        String apellidoLogin = sp.getString("apellido","-1");
-        String nombreLogin = sp.getString("nombre","-1");
-        String mailLogin = sp.getString("mail","-1");
-        String claveLogin = sp.getString("clave","-1");
-
-        if(mail.equals(mail) && password.equals(claveLogin)){
-            usuarioLogin = new Usuario(nombreLogin,apellidoLogin,dniLogin,mailLogin,claveLogin);
+        File archivo = new File(context.getFilesDir(), "personal.dat");
+        if (!archivo.exists()) {
+            return null; // Modificado para devolver null si el archivo no existe
         }
-        return usuarioLogin;
+
+        Usuario usuarioRegistrado = null;
+
+        try {
+            FileInputStream fis = new FileInputStream(archivo);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            usuarioRegistrado = (Usuario) ois.readObject(); // Modificado para leer solo un usuario
+            ois.close();
+            fis.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("leer-usuario", usuarioRegistrado.toString());
+        return usuarioRegistrado;
+    }
+
+    public static Usuario login(Context context, String mail, String password) {
+        Usuario usuarioRegistrado = leer(context);
+
+        Log.d("login-usuario", usuarioRegistrado.toString());
+
+        if (usuarioRegistrado != null && mail.equals(usuarioRegistrado.getMail()) && password.equals(usuarioRegistrado.getClave())) {
+            return usuarioRegistrado;
+        }
+        return null;
     }
 
 }
+
+
