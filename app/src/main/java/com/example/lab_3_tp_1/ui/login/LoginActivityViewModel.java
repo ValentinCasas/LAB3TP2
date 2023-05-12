@@ -13,13 +13,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.lab_3_tp_1.models.Usuario;
+import com.example.lab_3_tp_1.ui.registro.MainActivity;
 import com.example.lab_3_tp_1.ui.request.ApiClient;
 
 public class LoginActivityViewModel extends AndroidViewModel {
 
     private Context context;
     private ApiClient apiClient;
-    private MutableLiveData<Boolean> loginSuccess;
     private MutableLiveData<Usuario> dataUsuarioMutable;
 
     public LoginActivityViewModel(@NonNull Application application) {
@@ -28,14 +28,6 @@ public class LoginActivityViewModel extends AndroidViewModel {
         apiClient = new ApiClient();
         dataUsuarioMutable = new MutableLiveData<>();
     }
-
-    public LiveData<Boolean> getLoginSuccess() {
-        if (loginSuccess == null) {
-            loginSuccess = new MutableLiveData<>();
-        }
-        return loginSuccess;
-    }
-
     public LiveData<Usuario> getDataUsuarioMutable() {
         if (dataUsuarioMutable == null) {
             dataUsuarioMutable = new MutableLiveData<>();
@@ -43,19 +35,15 @@ public class LoginActivityViewModel extends AndroidViewModel {
         return dataUsuarioMutable;
     }
 
-
     public void confirmarLogin(String mail, String clave) {
-        Usuario usuario = apiClient.login(context, mail, clave);
+        Usuario usuario = apiClient.login(context ,mail, clave);
         if (usuario != null) {
-            loginSuccess.setValue(true);
-            if (dataUsuarioMutable != null) {
-                dataUsuarioMutable.setValue(usuario);
-            }
-            Log.d("dataUsuarioMutable", dataUsuarioMutable.getValue().toString());
-            Log.d("confirmarLogin-usuario", usuario.toString());
+            dataUsuarioMutable.setValue(usuario);
+            Intent intent = new Intent(getApplication(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            getApplication().startActivity(intent);
         } else {
-            loginSuccess.setValue(false);
-            Toast.makeText(context, "Credenciales erroneas", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplication(), "Credenciales invalidas", Toast.LENGTH_SHORT).show();
         }
     }
 

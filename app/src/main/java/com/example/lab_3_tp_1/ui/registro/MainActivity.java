@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mv = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(MainActivityViewModel.class);
-        loginViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(LoginActivityViewModel.class);
 
         Usuario usuario = (Usuario) getIntent().getSerializableExtra("usuario");
         if (usuario != null) {
